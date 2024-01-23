@@ -24,8 +24,7 @@
       </div>
     </div>
     <Notification v-if="!hasRequiredColumns" type="error" class="mt-4 text-left">
-      Invalid file format. Please upload a valid CSV file with columns "email",
-      "email_start_send_time" and "wallet".
+      Invalid file format. Please upload a valid CSV file with column "wallet".
     </Notification>
   </template>
 
@@ -55,7 +54,7 @@ const $papa = vueApp.config.globalProperties.$papa;
 const uploadedFile = ref<FileInfo | null>(null);
 const fileData = ref<CsvItem[] | null>(null);
 const fileColumns = ref<String[]>([]);
-const requiredColumns = ['email', 'email_start_send_time'];
+const requiredColumns = ['wallet'];
 
 const hasRequiredColumns = computed<boolean>(() =>
   requiredColumns.every(item => fileColumns.value.includes(item))

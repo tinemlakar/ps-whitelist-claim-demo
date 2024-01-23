@@ -65,6 +65,16 @@ export const ErrorCodes = {
   400005: 'Missing signature',
   400006: 'Token does not exists',
   400007: 'NFT already claimed',
+  400008: 'Wrong signature',
+  400009: 'Wrong admin',
+  403001: 'Missing auth token, please login!',
+  403002: 'UNKNOWN USER',
+  403003: 'UNAUTHORIZED',
+  403004: 'NOT ACTIVATED',
+  422001: 'Wallet not present',
+  422002: 'Wallet not valid',
+  422003: 'Wallet already taken',
+  422004: 'User not present',
 
   // SystemErrorCode
   500000: 'DEFAULT_SYSTEM_ERROR',

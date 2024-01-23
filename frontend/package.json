@@ -13,7 +13,8 @@
     "dayjs": "^1.11.9",
     "query-string": "^8.1.0",
     "vue-papa-parse": "^3.1.0",
-    "vue3-flip-countdown": "^0.1.6"
+    "vue3-flip-countdown": "^0.1.6",
+    "web3-validator": "^2.0.4"
   },
   "devDependencies": {
     "@css-render/vue3-ssr": "^0.15.12",

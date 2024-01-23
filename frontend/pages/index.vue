@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import UploadSVG from '~/assets/images/upload.svg';
 import { useAccount } from 'use-wagmi';
-import { AirdropStatus } from '~/lib/values/general.values';
 
 useHead({
-  title: 'Apillon email airdrop prebuilt solution',
+  title: 'Apillon whitelist claim prebuilt solution',
 });
 
 const message = useMessage();
@@ -41,11 +40,8 @@ function onFileUploaded(csvData: CsvItem[]) {
 
   const data: UserInterface[] = csvData.map(item => {
     return {
-      airdrop_status: AirdropStatus.PENDING,
-      email: item.email,
-      email_sent_time: null,
-      email_start_send_time: item.email_start_send_time,
-      wallet: null,
+      signature: item.signature || null,
+      wallet: item.wallet,
     } as UserInterface;
   });
 
@@ -53,8 +49,8 @@ function onFileUploaded(csvData: CsvItem[]) {
     items.value = data;
   } else {
     data.forEach(item => {
-      if (emailAlreadyExists(item.email)) {
-        message.warning(`Email: ${item.email} is already on the list`);
+      if (walletAlreadyExists(item.wallet)) {
+        message.warning(`Wallet: ${item.wallet} is already on the list`);
       } else {
         items.value.unshift(item as UserInterface);
       }
@@ -62,39 +58,45 @@ function onFileUploaded(csvData: CsvItem[]) {
   }
 }
 
-function emailAlreadyExists(email: string) {
-  return items.value.some(item => item.email === email);
+function walletAlreadyExists(wallet?: string | null): boolean {
+  return items.value.some(item => item.wallet === wallet && wallet);
 }
 
 async function getUsers() {
-  const res = await $api.get<UsersResponse>('/users', { itemsPerPage: 10000 });
-  items.value = res.data.items;
+  try {
+    const res = await $api.get<UsersResponse>('/users', { itemsPerPage: 10000 });
+    items.value = res.data.items;
+  } catch (e) {
+    handleError(e);
+  }
 }
 
 async function getStatistics() {
-  const res = await $api.get<StatisticsResponse>('/users/statistics');
-  statistics.value = res.data;
+  try {
+    const res = await $api.get<StatisticsResponse>('/users/statistics');
+    statistics.value = res.data;
+  } catch (e) {
+    handleError(e);
+  }
 }
 
 function addRecipient() {
   items.value.push({
-    airdrop_status: AirdropStatus.PENDING,
-    email: '',
-    email_sent_time: null,
-    email_start_send_time: null,
+    signature: null,
     wallet: null,
   });
 }
 
-function onUserRemove(email: string) {
-  items.value = items.value.filter(item => item.email !== email);
+function onUserRemove(wallet: string) {
+  items.value = items.value.filter(item => item.wallet !== wallet);
 }
 function onUserAdded(user: UserInterface) {
   items.value.push(JSON.parse(JSON.stringify(user)));
+  saveWallets();
 }
 
-async function proceed() {
-  const uploadItems = items.value.filter(item => !item.id && item.email);
+async function saveWallets() {
+  const uploadItems = items.value.filter(item => !item.id && item.wallet);
 
   if (!userStore.jwt) {
     message.warning('Please login first to proceed with this action');
@@ -132,7 +134,7 @@ async function proceed() {
 
         <div v-if="items && items.length" class="flex gap-4 items-center">
           <p>Price ≈ {{ selectedRecipients * 100 }} credits</p>
-          <Btn :disabled="!items || items.length === 0" @click="proceed()">Proceed</Btn>
+          <Btn :disabled="!items || items.length === 0" @click="saveWallets()">Save wallets</Btn>
         </div>
       </n-space>
     </div>

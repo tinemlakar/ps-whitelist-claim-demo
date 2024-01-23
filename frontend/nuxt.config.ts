@@ -16,8 +16,8 @@ if (env === Environments.prod) {
 }
 
 const meta = {
-  title: 'Apillon email prebuild solution',
-  description: 'airdrop email',
+  title: 'Apillon whitelist claim prebuild solution',
+  description: 'whitelist claim',
   url: 'https://apillon.io/',
 };
 

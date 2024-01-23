@@ -19,7 +19,7 @@ export default defineNuxtPlugin(nuxtApp => {
       new CoinbaseWalletConnector({
         chains,
         options: {
-          appName: 'Email test',
+          appName: 'Whitelist claim',
         },
       }),
       new WalletConnectConnector({

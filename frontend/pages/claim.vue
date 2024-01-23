@@ -6,11 +6,9 @@ definePageMeta({
   layout: 'claim',
 });
 useHead({
-  title: 'Apillon email airdrop prebuilt solution',
+  title: 'Apillon whitelist claim prebuilt solution',
 });
 
-const { query } = useRoute();
-const router = useRouter();
 const message = useMessage();
 const { handleError } = useErrors();
 
@@ -20,14 +18,9 @@ const { connect, connectors, isLoading } = useConnect();
 
 const loading = ref<boolean>(false);
 const claimed = ref<boolean>(false);
+const walletSignature = ref<string | null>(null);
 
-onBeforeMount(() => {
-  if (!query.token) {
-    router.push('/');
-  }
-});
-
-async function claimAirdrop() {
+async function validateWallet() {
   loading.value = true;
   try {
     await refetch();
@@ -44,11 +37,26 @@ async function claimAirdrop() {
     }
 
     const signature = await walletClient.value.signMessage({ message: `test\n${timestamp}` });
-    const res = await $api.post<SuccessResponse>('/users/claim', {
-      jwt: query.token?.toString() || '',
+    const res = await $api.post<ClaimResponse>('/users/claim', {
       signature,
       address: address.value,
       timestamp,
+    });
+    if (res.data && res.data.signature) {
+      message.success('You successfully claimed NFT');
+      walletSignature.value = res.data.signature;
+    }
+  } catch (e) {
+    handleError(e);
+  }
+  loading.value = false;
+}
+
+async function claim() {
+  loading.value = true;
+  try {
+    const res = await $api.post<SuccessResponse>('/users/mint', {
+      signature: walletSignature.value,
     });
     if (res.data && res.data.success) {
       message.success('You successfully claimed NFT');
@@ -63,7 +71,7 @@ async function claimAirdrop() {
 
 <template>
   <FormShare v-if="claimed" />
-  <div v-else class="max-w-md w-full md:px-6 my-12 mx-auto">
+  <div v-else-if="walletSignature" class="max-w-md w-full md:px-6 my-12 mx-auto">
     <img :src="SuccessSVG" class="mx-auto" width="165" height="169" alt="airdrop" />
 
     <div class="my-8 text-center">
@@ -73,7 +81,9 @@ async function claimAirdrop() {
         crucial for securely receiving and managing the airdropped NFTs.
       </p>
     </div>
-
+    <Btn size="large" :loading="loading" @click="claim()">Claim NFT</Btn>
+  </div>
+  <div v-else class="max-w-md w-full md:px-6 my-12 mx-auto">
     <Btn
       v-if="!isConnected"
       size="large"
@@ -82,6 +92,6 @@ async function claimAirdrop() {
     >
       Connect wallet
     </Btn>
-    <Btn v-else size="large" :loading="loading" @click="claimAirdrop()">Claim airdrop</Btn>
+    <Btn v-else size="large" :loading="loading" @click="validateWallet()">Validate wallet</Btn>
   </div>
 </template>

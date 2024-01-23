@@ -26,13 +26,9 @@ export type AuthResponse = {
 
 declare global {
   type CsvItem = {
-    email: string;
-    email_start_send_time: string;
-    email_send_time?: string | null;
-    tx_hash?: string | null;
-    wallet: string;
-    airdrop_status?: number | null;
+    signature?: string | null;
     status?: number | null;
+    wallet: string;
   };
 
   /** Papa parser */
@@ -66,14 +62,10 @@ declare global {
   type SuccessResponse = GeneralResponse<{ success: boolean }>;
 
   interface UserInterface {
-    airdrop_status: number;
     createTime?: string;
-    email: string;
-    email_sent_time: string | null;
-    email_start_send_time: string | null;
     id?: number | null;
+    signature: string | null;
     status?: number;
-    tx_hash?: string | null;
     updateTime?: string;
     wallet: string | null;
   }
@@ -81,13 +73,19 @@ declare global {
   type UsersResponse = GeneralItemsResponse<UserInterface>;
 
   interface StatisticsInterface {
-    airdropped: number;
-    emailSent: number;
-    pending: number;
-    threwError: number;
+    generatedSignature: number;
     total: number;
-    walletLinked: number;
   }
 
   type StatisticsResponse = GeneralResponse<StatisticsInterface>;
+
+  interface ClaimInterface {
+    createTime: string;
+    id: number;
+    signature: string;
+    status: number;
+    updateTime: string;
+    wallet: string;
+  }
+  type ClaimResponse = GeneralResponse<ClaimInterface>;
 }

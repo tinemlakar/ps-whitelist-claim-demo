@@ -1,4 +1,4 @@
-# Email airdrop prebuild solution
+#Whitelist claim prebuild solution
 
 ## Stack
 
