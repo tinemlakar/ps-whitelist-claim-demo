@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 defineProps({
   metadata: { type: Object as PropType<Metadata>, default: null },
+  txHash: { type: String, default: null },
 });
 </script>
 
@@ -18,7 +19,15 @@ defineProps({
         <h5>{{ metadata.name }}</h5>
       </div>
       <div class="mt-4 text-center">
-        <p>{{ metadata.description }}</p>
+        <p class="mb-4">{{ metadata.description }}</p>
+        <a
+          v-if="txHash"
+          :href="`https://sepolia.etherscan.io/tx/${txHash}`"
+          class="text-yellow hover:underline"
+          target="_blank"
+        >
+          Transaction: {{ shortHash(txHash) }}
+        </a>
       </div>
     </div>
 

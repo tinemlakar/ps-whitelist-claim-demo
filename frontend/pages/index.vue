@@ -1,161 +1,70 @@
 <script lang="ts" setup>
-import UploadSVG from '~/assets/images/upload.svg';
-import { useAccount } from 'use-wagmi';
+import { useAccount, useConnect, useWalletClient } from 'use-wagmi';
 
+definePageMeta({
+  layout: 'claim',
+});
 useHead({
   title: 'Apillon whitelist claim prebuilt solution',
 });
 
 const message = useMessage();
-const userStore = useUserStore();
-const { isConnected } = useAccount();
 const { handleError } = useErrors();
 
-const items = ref<UserInterface[]>([]);
-const statistics = ref<StatisticsInterface | null>(null);
-const modalUploadCsvVisible = ref<boolean>(false);
+const { address, isConnected } = useAccount();
+const { data: walletClient, refetch } = useWalletClient();
+const { connect, connectors } = useConnect();
 
-const isLoggedIn = computed(() => isConnected.value && userStore.jwt);
-const selectedRecipients = computed(() => items.value.length);
+const loading = ref<boolean>(false);
+const metadata = ref<Metadata | null>(null);
+const txHash = ref<string | undefined>();
+const walletSignature = ref<string | null>(null);
 
-onMounted(async () => {
-  if (isLoggedIn.value) {
-    await getUsers();
-    await getStatistics();
-  }
-});
+async function validateWallet() {
+  loading.value = true;
+  try {
+    await refetch();
+    const timestamp = new Date().getTime();
 
-watch(
-  () => isLoggedIn.value,
-  async _ => {
-    if (isLoggedIn.value) {
-      await getUsers();
-      await getStatistics();
-    }
-  }
-);
+    if (!walletClient.value) {
+      await connect({ connector: connectors.value[0] });
 
-function onFileUploaded(csvData: CsvItem[]) {
-  modalUploadCsvVisible.value = false;
-
-  const data: UserInterface[] = csvData.map(item => {
-    return {
-      signature: item.signature || null,
-      wallet: item.wallet,
-    } as UserInterface;
-  });
-
-  if (!Array.isArray(items.value) || items.value.length === 0) {
-    items.value = data;
-  } else {
-    data.forEach(item => {
-      if (walletAlreadyExists(item.wallet)) {
-        message.warning(`Wallet: ${item.wallet} is already on the list`);
-      } else {
-        items.value.unshift(item as UserInterface);
+      if (!walletClient.value) {
+        message.error('Could not connect with wallet');
+        loading.value = false;
+        return;
       }
+    }
+
+    const signature = await walletClient.value.signMessage({ message: `test\n${timestamp}` });
+    const res = await $api.post<ClaimResponse>('/users/claim', {
+      signature,
+      address: address.value,
+      timestamp,
     });
-  }
-}
-
-function walletAlreadyExists(wallet?: string | null): boolean {
-  return items.value.some(item => item.wallet === wallet && wallet);
-}
-
-async function getUsers() {
-  try {
-    const res = await $api.get<UsersResponse>('/users', { itemsPerPage: 10000 });
-    items.value = res.data.items;
+    if (res.data && res.data.signature) {
+      message.success('You have successfully validated your wallet and can now claim your NFT.');
+      walletSignature.value = res.data.signature;
+    }
   } catch (e) {
     handleError(e);
   }
+  loading.value = false;
 }
 
-async function getStatistics() {
-  try {
-    const res = await $api.get<StatisticsResponse>('/users/statistics');
-    statistics.value = res.data;
-  } catch (e) {
-    handleError(e);
-  }
-}
-
-function addRecipient() {
-  items.value.push({
-    signature: null,
-    wallet: null,
-  });
-}
-
-function onUserRemove(wallet: string) {
-  items.value = items.value.filter(item => item.wallet !== wallet);
-}
-function onUserAdded(user: UserInterface) {
-  items.value.push(JSON.parse(JSON.stringify(user)));
-  saveWallets();
-}
-
-async function saveWallets() {
-  const uploadItems = items.value.filter(item => !item.id && item.wallet);
-
-  if (!userStore.jwt) {
-    message.warning('Please login first to proceed with this action');
-    return;
-  } else if (!uploadItems || uploadItems.length === 0) {
-    message.warning('Upload CSV file and add some recipients first.');
-    return;
-  }
-
-  try {
-    await $api.post('/users', { users: uploadItems });
-    await getUsers();
-    await getStatistics();
-
-    message.success('Recipients are successfully added.');
-  } catch (e) {
-    handleError(e);
-  }
+function onClaim(m: Metadata, hash?: string) {
+  metadata.value = m;
+  txHash.value = hash;
 }
 </script>
 
 <template>
-  <div>
-    <div class="w-full my-12 mx-auto">
-      <h3 class="my-8">NFT Collection Stock</h3>
-
-      <Statistics v-if="statistics" :statistics="statistics" />
-      <TableUsers v-if="items" :users="items" @add-user="onUserAdded" @remove-user="onUserRemove" />
-
-      <n-space class="w-full my-8" size="large" align="center" justify="space-between">
-        <n-space size="large">
-          <Btn @click="modalUploadCsvVisible = true"> Upload CSV </Btn>
-          <Btn type="secondary" @click="addRecipient"> Add recipient </Btn>
-        </n-space>
-
-        <div v-if="items && items.length" class="flex gap-4 items-center">
-          <p>Price ≈ {{ selectedRecipients * 100 }} credits</p>
-          <Btn :disabled="!items || items.length === 0" @click="saveWallets()">Save wallets</Btn>
-        </div>
-      </n-space>
-    </div>
-
-    <modal
-      :show="modalUploadCsvVisible"
-      @close="() => (modalUploadCsvVisible = false)"
-      @update:show="modalUploadCsvVisible = false"
-    >
-      <div class="max-w-md w-full md:px-6 my-12 mx-auto">
-        <div class="mb-5 text-center">
-          <img :src="UploadSVG" class="mx-auto" width="203" height="240" alt="airdrop" />
-          <h3 class="my-8 text-center">Upload your CSV file with recipients’ addresses</h3>
-          <p class="text-center">
-            Select and upload the CSV file containing addresses to which you wish to distribute
-            NFTs.
-          </p>
-          <Btn type="builders" size="tiny" href="/files/example.csv"> Download CSV sample </Btn>
-        </div>
-        <FormUpload @close="modalUploadCsvVisible = false" @proceed="onFileUploaded" />
-      </div>
-    </modal>
+  <FormShare v-if="metadata" :metadata="metadata" :tx-hash="txHash" />
+  <FormClaim v-else-if="walletSignature" :signature="walletSignature" @claim="onClaim" />
+  <div v-else class="max-w-md w-full md:px-6 my-12 mx-auto">
+    <ConnectWallet v-if="!isConnected" size="large" />
+    <Btn v-else size="large" :loading="loading" @click="validateWallet()">
+      Wallet eligibility check
+    </Btn>
   </div>
 </template>

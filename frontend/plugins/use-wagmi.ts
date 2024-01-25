@@ -19,12 +19,14 @@ export default defineNuxtPlugin(nuxtApp => {
           UNSTABLE_shimOnConnectSelectAccount: true,
         },
       }),
-      new CoinbaseWalletConnector({
-        chains,
-        options: {
-          appName: 'Whitelist claim',
-        },
-      }),
+      markRaw(
+        new CoinbaseWalletConnector({
+          chains,
+          options: {
+            appName: 'Whitelist claim',
+          },
+        })
+      ),
       new WalletConnectConnector({
         chains,
         options: {

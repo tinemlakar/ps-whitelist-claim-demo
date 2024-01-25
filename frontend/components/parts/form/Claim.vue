@@ -39,6 +39,7 @@ async function claim() {
 
     const tx = await contract.value.connect(provider.value.getSigner()).mint(1, props.signature);
     if (tx) {
+      console.debug('Transaction', tx);
       message.success('You successfully claimed NFT');
     }
 
@@ -46,7 +47,7 @@ async function claim() {
       console.debug('Transaction receipt', receipt);
 
       // get metadata
-      await getMyNFT();
+      await getMyNFT(receipt.transactionHash);
     });
   } catch (e) {
     contractError(e);
@@ -54,7 +55,7 @@ async function claim() {
   loading.value = false;
 }
 
-async function getMyNFT() {
+async function getMyNFT(txHash?: string) {
   const balance = contract.value ? await contract.value.balanceOf(address.value) : null;
 
   if (!contract.value || !balance || balance.toNumber() === 0) {
@@ -74,7 +75,7 @@ async function getMyNFT() {
     });
 
     if (metadata) {
-      emits('claim', metadata);
+      emits('claim', metadata, txHash);
     } else {
       message.error('Missing metadata');
     }

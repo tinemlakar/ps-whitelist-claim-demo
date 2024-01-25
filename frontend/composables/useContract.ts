@@ -16,22 +16,27 @@ export default function useContract() {
   const contract = ref<Contract | null>(null);
   const provider = ref<providers.Web3Provider | null>(null);
 
-  function initProvider() {
+  async function initProvider() {
     if (connector && connector.value) {
       if (!chain || !chain.value || chain?.value.id !== usedChain.id) {
         switchNetwork(usedChain.id);
       }
-      provider.value = markRaw(
-        new ethers.providers.Web3Provider(connector.value.options.getProvider())
-      );
+      const p = connector.value?.options?.getProvider
+        ? connector.value.options.getProvider()
+        : connector.value?.getProvider
+        ? await connector.value.getProvider()
+        : null;
+      if (p) {
+        provider.value = markRaw(new ethers.providers.Web3Provider(p));
+      }
     }
   }
 
   /**
    * Helper for initializing specific contract
    */
-  function initContract() {
-    initProvider();
+  async function initContract() {
+    await initProvider();
 
     if (!contractAddress) {
       message.warning('Please provide contract address in config!');
