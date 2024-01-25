@@ -78,6 +78,7 @@ async function login() {
   try {
     if (!isConnected.value) {
       await connect({ connector: connectors.value[0] });
+      modalWalletVisible.value = false;
     } else {
       await refetch();
 
@@ -93,6 +94,7 @@ async function login() {
 
       if (!props.admin) {
         loading.value = false;
+        modalWalletVisible.value = false;
         return;
       }
 

@@ -1,12 +1,15 @@
 import { UseWagmiPlugin, createConfig } from 'use-wagmi';
-import { moonbaseAlpha } from 'use-wagmi/chains';
 import { MetaMaskConnector } from 'use-wagmi/connectors/metaMask';
 import { CoinbaseWalletConnector } from 'use-wagmi/connectors/coinbaseWallet';
 import { WalletConnectConnector } from 'use-wagmi/connectors/walletConnect';
 import { createPublicClient, http } from 'viem';
+import { mainnet, sepolia } from 'use-wagmi/chains';
 
 export default defineNuxtPlugin(nuxtApp => {
-  const chains = [moonbaseAlpha];
+  const nuxtConfig = useRuntimeConfig();
+  const chain = nuxtConfig.public.env === 'prod' ? mainnet : sepolia;
+  const chains = [chain];
+
   const config = createConfig({
     autoConnect: true,
     connectors: [
@@ -29,19 +32,9 @@ export default defineNuxtPlugin(nuxtApp => {
           qrcode: true,
         },
       }),
-      // new InjectedConnector({
-      //   chains,
-      //   options: {
-      //     name: detectedName =>
-      //       `Injected (${
-      //         typeof detectedName === 'string' ? detectedName : detectedName.join(', ')
-      //       })`,
-      //     shimDisconnect: true,
-      //   },
-      // }),
     ],
     publicClient: createPublicClient({
-      chain: moonbaseAlpha,
+      chain: chain,
       transport: http(),
     }),
   });

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import SuccessSVG from '~/assets/images/success.svg';
 import { useAccount, useConnect, useWalletClient } from 'use-wagmi';
 
 definePageMeta({
@@ -17,7 +16,7 @@ const { data: walletClient, refetch } = useWalletClient();
 const { connect, connectors, isLoading } = useConnect();
 
 const loading = ref<boolean>(false);
-const claimed = ref<boolean>(false);
+const metadata = ref<Metadata | null>(null);
 const walletSignature = ref<string | null>(null);
 
 async function validateWallet() {
@@ -43,24 +42,8 @@ async function validateWallet() {
       timestamp,
     });
     if (res.data && res.data.signature) {
-      message.success('You successfully claimed NFT');
+      message.success('You have successfully validated your wallet and can now claim your NFT.');
       walletSignature.value = res.data.signature;
-    }
-  } catch (e) {
-    handleError(e);
-  }
-  loading.value = false;
-}
-
-async function claim() {
-  loading.value = true;
-  try {
-    const res = await $api.post<SuccessResponse>('/users/mint', {
-      signature: walletSignature.value,
-    });
-    if (res.data && res.data.success) {
-      message.success('You successfully claimed NFT');
-      claimed.value = true;
     }
   } catch (e) {
     handleError(e);
@@ -70,19 +53,12 @@ async function claim() {
 </script>
 
 <template>
-  <FormShare v-if="claimed" />
-  <div v-else-if="walletSignature" class="max-w-md w-full md:px-6 my-12 mx-auto">
-    <img :src="SuccessSVG" class="mx-auto" width="165" height="169" alt="airdrop" />
-
-    <div class="my-8 text-center">
-      <h3 class="mb-6">Great Success!</h3>
-      <p>
-        To join this NFT airdrop, you need to connect your EVM compatible wallet. This step is
-        crucial for securely receiving and managing the airdropped NFTs.
-      </p>
-    </div>
-    <Btn size="large" :loading="loading" @click="claim()">Claim NFT</Btn>
-  </div>
+  <FormShare v-if="metadata" :metadata="metadata" />
+  <FormClaim
+    v-else-if="walletSignature"
+    :signature="walletSignature"
+    @claim="m => (metadata = m)"
+  />
   <div v-else class="max-w-md w-full md:px-6 my-12 mx-auto">
     <Btn
       v-if="!isConnected"

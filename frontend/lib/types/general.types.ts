@@ -1,7 +1,7 @@
 export interface ConfigInterface {
-  APP_URL: string;
   API_BASE: string;
   CHAIN_ID: string;
+  CONTRACT_ADDRESS: string;
 }
 
 export type AuthResponseProfile = {
@@ -88,4 +88,10 @@ declare global {
     wallet: string;
   }
   type ClaimResponse = GeneralResponse<ClaimInterface>;
+
+  type Metadata = {
+    name: string;
+    description: string;
+    image: string;
+  };
 }
