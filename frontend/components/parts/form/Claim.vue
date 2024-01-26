@@ -67,10 +67,7 @@ async function getMyNFT(txHash?: string) {
     const id = await contract.value.tokenOfOwnerByIndex(address.value, 0);
     const url = await contract.value.tokenURI(id);
 
-    // TODO: change URL
-    const metadata = await fetch(
-      'https://bafybeidrw3rbuicnyra4rterlp3bh64qexkox33zvezhtnhglolejp5moa.ipfs.nectarnode.io/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaWQiOiJiYWZ5YmVpZHJ3M3JidWljbnlyYTRydGVybHAzYmg2NHFleGtveDMzenZlemh0bmhnbG9sZWpwNW1vYSIsInByb2plY3RfdXVpZCI6ImFhZDliNmMxLTNiYzgtNDQ0YS1hZjQxLTM2ZTVlYjMwMDBmNyIsImlhdCI6MTcwNjE2ODg0Miwic3ViIjoiSVBGUy10b2tlbiJ9.LFOWeqKKas_5rcgklN-rXC2zUDP9SQhDeTQYNgI1818'
-    ).then(response => {
+    const metadata = await fetch(url).then(response => {
       return response.json();
     });
 
