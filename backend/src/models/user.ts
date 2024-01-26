@@ -8,7 +8,7 @@ import {
 import { uniqueFieldValue } from '../lib/validators';
 import { BaseSqlModel, prop } from './base-sql-model';
 import { stringLowerCaseParser } from '../lib/parsers';
-import { stringParser } from '@rawmodel/parsers';
+import { integerParser, stringParser } from '@rawmodel/parsers';
 import { Context } from '../context';
 import { SqlError } from '../lib/errors';
 import { getQueryParams, selectAndCountQuery } from '../lib/sql-utils';
@@ -51,6 +51,19 @@ export class User extends BaseSqlModel {
     fakeValue: null,
   })
   public signature: string;
+
+  /**
+   * amount
+   */
+  @prop({
+    parser: { resolver: integerParser() },
+    populatable: [PopulateStrategy.DB, PopulateStrategy.ADMIN],
+    serializable: [SerializedStrategy.DB, SerializedStrategy.PROFILE, SerializedStrategy.ADMIN],
+    validators: [],
+    defaultValue: 1,
+    fakeValue: 1,
+  })
+  public amount: number;
 
   /**
    * Class constructor.
@@ -138,7 +151,8 @@ export class User extends BaseSqlModel {
           u.id,
           u.status,
           u.createTime, u.updateTime,
-          u.signature, u.wallet
+          u.signature, u.wallet, 
+          u.amount
         `,
       qFrom: `
         FROM user u
