@@ -1,20 +1,20 @@
-import { ethAddressValidator, presenceValidator } from '@rawmodel/validators';
+import { ethAddressValidator, presenceValidator } from "@rawmodel/validators";
 import {
   PopulateStrategy,
   SerializedStrategy,
   SystemErrorCode,
   ValidatorErrorCode,
-} from '../config/values';
-import { uniqueFieldValue } from '../lib/validators';
-import { BaseSqlModel, prop } from './base-sql-model';
-import { stringLowerCaseParser } from '../lib/parsers';
-import { integerParser, stringParser } from '@rawmodel/parsers';
-import { Context } from '../context';
-import { SqlError } from '../lib/errors';
-import { getQueryParams, selectAndCountQuery } from '../lib/sql-utils';
+} from "../config/values";
+import { uniqueFieldValue } from "../lib/validators";
+import { BaseSqlModel, prop } from "./base-sql-model";
+import { stringLowerCaseParser } from "../lib/parsers";
+import { integerParser, stringParser } from "@rawmodel/parsers";
+import { Context } from "../context";
+import { SqlError } from "../lib/errors";
+import { getQueryParams, selectAndCountQuery } from "../lib/sql-utils";
 
 export class User extends BaseSqlModel {
-  protected _tableName = 'user';
+  protected _tableName = "user";
 
   /**
    * wallet
@@ -31,13 +31,17 @@ export class User extends BaseSqlModel {
         code: ValidatorErrorCode.PROFILE_WALLET_NOT_VALID,
       },
       {
-        resolver: uniqueFieldValue('user', 'wallet'),
+        resolver: uniqueFieldValue("user", "wallet"),
         code: ValidatorErrorCode.PROFILE_WALLET_ALREADY_TAKEN,
       },
     ],
     populatable: [PopulateStrategy.DB, PopulateStrategy.ADMIN],
-    serializable: [SerializedStrategy.DB, SerializedStrategy.PROFILE, SerializedStrategy.ADMIN],
-    fakeValue: '0x375207c35e670bdF4d2bC45d182117F2f67618B1',
+    serializable: [
+      SerializedStrategy.DB,
+      SerializedStrategy.PROFILE,
+      SerializedStrategy.ADMIN,
+    ],
+    fakeValue: "0x375207c35e670bdF4d2bC45d182117F2f67618B1",
   })
   public wallet: string;
 
@@ -47,7 +51,11 @@ export class User extends BaseSqlModel {
   @prop({
     parser: { resolver: stringParser() },
     populatable: [PopulateStrategy.DB],
-    serializable: [SerializedStrategy.DB, SerializedStrategy.PROFILE, SerializedStrategy.ADMIN],
+    serializable: [
+      SerializedStrategy.DB,
+      SerializedStrategy.PROFILE,
+      SerializedStrategy.ADMIN,
+    ],
     fakeValue: null,
   })
   public signature: string;
@@ -58,7 +66,11 @@ export class User extends BaseSqlModel {
   @prop({
     parser: { resolver: integerParser() },
     populatable: [PopulateStrategy.DB, PopulateStrategy.ADMIN],
-    serializable: [SerializedStrategy.DB, SerializedStrategy.PROFILE, SerializedStrategy.ADMIN],
+    serializable: [
+      SerializedStrategy.DB,
+      SerializedStrategy.PROFILE,
+      SerializedStrategy.ADMIN,
+    ],
     validators: [],
     defaultValue: 1,
     fakeValue: 1,
@@ -82,7 +94,12 @@ export class User extends BaseSqlModel {
       await this.db().commit(conn);
     } catch (err) {
       await this.db().rollback(conn);
-      throw new SqlError(err, this.getContext(), SystemErrorCode.DATABASE_ERROR, 'user/create');
+      throw new SqlError(
+        err,
+        this.getContext(),
+        SystemErrorCode.DATABASE_ERROR,
+        "user/create"
+      );
     }
   }
 
@@ -135,11 +152,16 @@ export class User extends BaseSqlModel {
 
     // map url query with sql fields
     const fieldMap = {
-      id: 'u.id',
-      wallet: 'u.wallet',
-      status: 'u.status',
+      id: "u.id",
+      wallet: "u.wallet",
+      status: "u.status",
     };
-    const { params, filters } = getQueryParams(defaultParams, 'u', fieldMap, urlQuery);
+    const { params, filters } = getQueryParams(
+      defaultParams,
+      "u",
+      fieldMap,
+      urlQuery
+    );
     if (filters.limit === -1) {
       filters.limit = null;
     }
@@ -166,19 +188,31 @@ export class User extends BaseSqlModel {
       qFilter: `
         ORDER BY ${
           filters.orderArr
-            ? `${filters.orderArr.join(', ') || 'u.updateTime DESC'}`
-            : 'u.updateTime DESC'
+            ? `${filters.orderArr.join(", ") || "u.updateTime DESC"}`
+            : "u.updateTime DESC"
         }
-        ${filters.limit !== null ? `LIMIT ${filters.limit} OFFSET ${filters.offset}` : ''};
+        ${
+          filters.limit !== null
+            ? `LIMIT ${filters.limit} OFFSET ${filters.offset}`
+            : ""
+        };
       `,
     };
 
-    const { items, total } = await selectAndCountQuery(this.db(), sqlQuery, params, 'u.id');
+    const { items, total } = await selectAndCountQuery(
+      this.db(),
+      sqlQuery,
+      params,
+      "u.id"
+    );
     const conn = await this.db().db.getConnection();
     try {
       const populatedItems = await Promise.all(
-        items.map(async item => {
-          const u = new User({}, this.getContext()).populate(item, PopulateStrategy.DB);
+        items.map(async (item) => {
+          const u = new User({}, this.getContext()).populate(
+            item,
+            PopulateStrategy.DB
+          );
           return u.serialize(serializedStrategy);
         })
       );
