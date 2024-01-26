@@ -2,6 +2,7 @@ export interface ConfigInterface {
   API_BASE: string;
   CHAIN_ID: string;
   CONTRACT_ADDRESS: string;
+  CLAIM_START: number;
 }
 
 export type AuthResponseProfile = {
@@ -26,6 +27,7 @@ export type AuthResponse = {
 
 declare global {
   type CsvItem = {
+    amount?: number | null;
     signature?: string | null;
     status?: number | null;
     wallet: string;
@@ -62,6 +64,7 @@ declare global {
   type SuccessResponse = GeneralResponse<{ success: boolean }>;
 
   interface UserInterface {
+    amount: number;
     createTime?: string;
     id?: number | null;
     signature: string | null;
@@ -80,6 +83,7 @@ declare global {
   type StatisticsResponse = GeneralResponse<StatisticsInterface>;
 
   interface ClaimInterface {
+    amount: number;
     createTime: string;
     id: number;
     signature: string;

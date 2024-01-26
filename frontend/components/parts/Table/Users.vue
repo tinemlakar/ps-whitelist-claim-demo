@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import { isAddress } from 'web3-validator';
 import type { DataTableColumns } from 'naive-ui';
-import { NInput } from 'naive-ui';
+import { NInput, NInputNumber } from 'naive-ui';
 import { PaginationValues } from '~/lib/values/general.values';
 
 const props = defineProps({
@@ -20,6 +20,7 @@ const emit = defineEmits(['addUser', 'removeUser']);
 const message = useMessage();
 
 const newUser = ref<UserInterface>({
+  amount: 1,
   signature: null,
   wallet: null,
 });
@@ -45,6 +46,27 @@ const createColumns = (): DataTableColumns<UserInterface> => {
           });
         } else {
           return h(resolveComponent('TableEllipsis'), { text: row.wallet }, '');
+        }
+      },
+    },
+    {
+      key: 'amount',
+      title: 'Amount',
+      minWidth: 80,
+      render(row: UserInterface, index: number) {
+        if (isEditable(row, index)) {
+          return h(NInputNumber, {
+            value: newUser.value.amount,
+            type: 'email',
+            min: 1,
+            max: 100,
+            step: 1,
+            onUpdateValue(v) {
+              newUser.value.amount = intVal(v || 0);
+            },
+          });
+        } else {
+          return h('span', { class: 'whitespace-nowrap' }, row.amount);
         }
       },
     },
@@ -89,8 +111,11 @@ function addItem(user: UserInterface) {
     return;
   }
 
+  user.amount = newUser.value.amount;
   user.signature = newUser.value.signature;
   user.wallet = newUser.value.wallet;
+
+  newUser.value.amount = 1;
   newUser.value.signature = null;
   newUser.value.wallet = null;
 

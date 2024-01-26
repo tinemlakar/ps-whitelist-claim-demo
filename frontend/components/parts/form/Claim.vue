@@ -4,6 +4,7 @@ import SuccessSVG from '~/assets/images/success.svg';
 
 const props = defineProps({
   signature: { type: String, required: true },
+  amount: { type: Number, default: 1 },
 });
 const emits = defineEmits(['claim']);
 
@@ -37,22 +38,26 @@ async function claim() {
       return;
     }
 
-    const tx = await contract.value.connect(provider.value.getSigner()).mint(1, props.signature);
+    const tx = await contract.value
+      .connect(provider.value.getSigner())
+      .mint(props.amount, props.signature);
     if (tx) {
       console.debug('Transaction', tx);
-      message.success('You successfully claimed NFT');
+      message.info('Your NFT Mint has started');
     }
 
     tx.wait().then(async (receipt: any) => {
       console.debug('Transaction receipt', receipt);
+      message.success('You successfully claimed NFT');
 
       // get metadata
       await getMyNFT(receipt.transactionHash);
+      loading.value = false;
     });
   } catch (e) {
     contractError(e);
+    loading.value = false;
   }
-  loading.value = false;
 }
 
 async function getMyNFT(txHash?: string) {

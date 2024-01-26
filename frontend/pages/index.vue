@@ -9,8 +9,10 @@ useHead({
 });
 
 const message = useMessage();
+const config = useRuntimeConfig();
 const { handleError } = useErrors();
 
+const timestamp = useTimestamp();
 const { address, isConnected } = useAccount();
 const { data: walletClient, refetch } = useWalletClient();
 const { connect, connectors } = useConnect();
@@ -18,7 +20,10 @@ const { connect, connectors } = useConnect();
 const loading = ref<boolean>(false);
 const metadata = ref<Metadata | null>(null);
 const txHash = ref<string | undefined>();
+const amount = ref<number>(1);
 const walletSignature = ref<string | null>(null);
+
+const timeToStart = computed(() => config.public.CLAIM_START - timestamp.value);
 
 async function validateWallet() {
   loading.value = true;
@@ -44,6 +49,7 @@ async function validateWallet() {
     });
     if (res.data && res.data.signature) {
       message.success('You have successfully validated your wallet and can now claim your NFT.');
+      amount.value = res.data.amount;
       walletSignature.value = res.data.signature;
     }
   } catch (e) {
@@ -60,7 +66,16 @@ function onClaim(m: Metadata, hash?: string) {
 
 <template>
   <FormShare v-if="metadata" :metadata="metadata" :tx-hash="txHash" />
-  <FormClaim v-else-if="walletSignature" :signature="walletSignature" @claim="onClaim" />
+  <NftCountdown
+    v-else-if="walletSignature && timeToStart > 0"
+    :timestamp="$config.public.CLAIM_START"
+  />
+  <FormClaim
+    v-else-if="walletSignature"
+    :amount="amount"
+    :signature="walletSignature"
+    @claim="onClaim"
+  />
   <div v-else class="max-w-md w-full md:px-6 my-12 mx-auto">
     <ConnectWallet v-if="!isConnected" size="large" />
     <Btn v-else size="large" :loading="loading" @click="validateWallet()">

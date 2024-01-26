@@ -1,2 +1,2 @@
-wallet
-0xEVM_wallet_address
+wallet,amount
+0xEVM_wallet_address,1

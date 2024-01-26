@@ -40,6 +40,7 @@ function onFileUploaded(csvData: CsvItem[]) {
 
   const data: UserInterface[] = csvData.map(item => {
     return {
+      amount: item.amount || 1,
       signature: item.signature || null,
       wallet: item.wallet,
     } as UserInterface;
@@ -65,7 +66,21 @@ function walletAlreadyExists(wallet?: string | null): boolean {
 async function getUsers() {
   try {
     const res = await $api.get<UsersResponse>('/users', { itemsPerPage: 10000 });
-    items.value = res.data.items;
+    if (items.value.length === 0 || items.value.length === res.data.items.length) {
+      items.value = res.data.items;
+    } else {
+      res.data.items.forEach(item => {
+        const recipient = items.value.find(r => r.wallet === item.wallet);
+        if (recipient) {
+          recipient.amount = item.amount;
+          recipient.id = item.id;
+          recipient.signature = item.signature;
+          recipient.wallet = item.wallet;
+        } else {
+          items.value.unshift(item);
+        }
+      });
+    }
   } catch (e) {
     handleError(e);
   }
@@ -82,6 +97,7 @@ async function getStatistics() {
 
 function addRecipient() {
   items.value.push({
+    amount: 1,
     signature: null,
     wallet: null,
   });
