@@ -5,7 +5,6 @@ import { ResourceError } from "../lib/errors";
 import { User } from "../models/user";
 import { Identity } from "@apillon/sdk";
 import { generateSignature } from "../lib/blockchain";
-import { env } from "../config/env";
 
 /**∂
  * Installs new route on the provided application.
@@ -46,7 +45,7 @@ export async function resolve(req: Request, res: Response): Promise<void> {
     throw new ResourceError(RouteErrorCode.USER_DOES_NOT_EXIST);
   }
 
-  if (new Date().getTime() >= env.CLAIM_START) {
+  if (new Date().getTime() >= context.env.CLAIM_START) {
     const signature = await generateSignature(user.wallet, user.amount);
     user.signature = signature;
     await user.update();
