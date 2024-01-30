@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ModalProps } from 'naive-ui';
+import type { ModalProps } from 'naive-ui';
 
 /**
  * https://github.com/vuejs/core/issues/8286#issuecomment-1545659320

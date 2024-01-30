@@ -10,7 +10,15 @@ const emits = defineEmits(['claim']);
 
 const message = useMessage();
 const { address } = useAccount();
-const { contract, provider, initContract, contractError } = useContract();
+const {
+  contract,
+  initContract,
+  contractError,
+  getBalance,
+  getTokenOfOwner,
+  getTokenUri,
+  isWalletUsed,
+} = useContract();
 
 const loading = ref<boolean>(false);
 const walletUsed = ref<boolean>(false);
@@ -20,7 +28,7 @@ onMounted(() => {
 });
 
 async function claim() {
-  if (!contract.value || !provider.value) {
+  if (!contract.value) {
     console.warn('Please check CONTRACT_ADDRESS config!');
     message.warning('Failed to establish connection to contract.');
     return;
@@ -28,9 +36,8 @@ async function claim() {
   loading.value = true;
 
   try {
-    walletUsed.value = await contract.value
-      .connect(provider.value.getSigner())
-      .walletUsed(address.value);
+    walletUsed.value = await isWalletUsed();
+    console.log(walletUsed.value);
 
     if (walletUsed.value) {
       message.success('You already claimed NFT');
@@ -38,8 +45,7 @@ async function claim() {
       return;
     }
 
-    const tx = await contract.value
-      .connect(provider.value.getSigner())
+    const tx = await contract.value.
       .mint(props.amount, props.signature);
     if (tx) {
       console.debug('Transaction', tx);
@@ -61,16 +67,16 @@ async function claim() {
 }
 
 async function getMyNFT(txHash?: string) {
-  const balance = contract.value ? await contract.value.balanceOf(address.value) : null;
+  const balance = contract.value ? await getBalance() : null;
 
-  if (!contract.value || !balance || balance.toNumber() === 0) {
+  if (!contract.value || !balance || balance.toString() === '0') {
     loading.value = false;
     return;
   }
 
   try {
-    const id = await contract.value.tokenOfOwnerByIndex(address.value, 0);
-    const url = await contract.value.tokenURI(id);
+    const id = await getTokenOfOwner(0);
+    const url = await getTokenUri(id);
 
     const metadata = await fetch(url).then(response => {
       return response.json();
