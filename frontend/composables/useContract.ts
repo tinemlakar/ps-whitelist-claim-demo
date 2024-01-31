@@ -19,10 +19,10 @@ export default function useContract() {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const contractAddress = config.public.CONTRACT_ADDRESS;
+  const contractAddress = config.public.CONTRACT_ADDRESS as `0x${string}`;
   const usedChain = config.public.env === 'prod' ? mainnet : sepolia;
 
-  const contract = ref(null);
+  const contract = ref();
 
   const { refetch: getWalletUsed } = useContractRead({
     address: contractAddress,
@@ -48,13 +48,13 @@ export default function useContract() {
   }
 
   async function mint(amount: number, signature: string) {
-    return await contract.value.mint(amount, signature);
+    return await contract.value.write.mint([amount, signature]);
   }
 
   /**
    * Helper for initializing specific contract
    */
-  async function initContract() {
+  function initContract() {
     if (!chain || !chain.value || chain?.value.id !== usedChain.id) {
       switchNetwork(usedChain.id);
     }
@@ -106,7 +106,10 @@ export default function useContract() {
       } else if (errorData.includes('valid recovery code')) {
         // Problem with embedded signature
         msg = 'Problem with embedded wallet';
-      } else if (errorData.includes('user rejected transaction')) {
+      } else if (
+        errorData.includes('user rejected transaction') ||
+        errorData.includes('User rejected the request')
+      ) {
         // User rejected the transaction
         msg = 'Transaction was rejected.';
       } else {
@@ -128,5 +131,6 @@ export default function useContract() {
     getWalletUsed,
     isWalletUsed,
     initContract,
+    mint,
   };
 }

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import { Countdown } from 'vue3-flip-countdown';
 import colors from '~~/tailwind.colors';
 import SuccessSVG from '~/assets/images/success.svg';
-import { Countdown } from 'vue3-flip-countdown';
 
 defineProps({
   timestamp: { type: Number, default: 0 },

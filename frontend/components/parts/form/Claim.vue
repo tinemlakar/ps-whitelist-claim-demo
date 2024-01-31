@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useAccount } from 'use-wagmi';
 import SuccessSVG from '~/assets/images/success.svg';
 
 const props = defineProps({
@@ -9,7 +8,7 @@ const props = defineProps({
 const emits = defineEmits(['claim']);
 
 const message = useMessage();
-const { address } = useAccount();
+const txWait = useTxWait();
 const {
   contract,
   initContract,
@@ -18,6 +17,7 @@ const {
   getTokenOfOwner,
   getTokenUri,
   isWalletUsed,
+  mint,
 } = useContract();
 
 const loading = ref<boolean>(false);
@@ -37,7 +37,6 @@ async function claim() {
 
   try {
     walletUsed.value = await isWalletUsed();
-    console.log(walletUsed.value);
 
     if (walletUsed.value) {
       message.success('You already claimed NFT');
@@ -45,21 +44,19 @@ async function claim() {
       return;
     }
 
-    const tx = await contract.value.
-      .mint(props.amount, props.signature);
-    if (tx) {
-      console.debug('Transaction', tx);
-      message.info('Your NFT Mint has started');
-    }
+    txWait.hash.value = await mint(props.amount, props.signature);
 
-    tx.wait().then(async (receipt: any) => {
-      console.debug('Transaction receipt', receipt);
-      message.success('You successfully claimed NFT');
+    console.debug('Transaction', txWait.hash.value);
+    message.info('Your NFT Mint has started');
 
-      // get metadata
-      await getMyNFT(receipt.transactionHash);
-      loading.value = false;
-    });
+    await txWait.wait();
+
+    console.debug('Transaction receipt', txWait.hash.value);
+    message.success('You successfully claimed NFT');
+
+    // get metadata
+    await getMyNFT(txWait.hash.value);
+    loading.value = false;
   } catch (e) {
     contractError(e);
     loading.value = false;

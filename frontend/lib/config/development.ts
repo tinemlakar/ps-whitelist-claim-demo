@@ -1,4 +1,4 @@
-import { ConfigInterface } from '~/lib/types/general.types';
+import type { ConfigInterface } from '~/lib/types/general.types';
 
 const config: ConfigInterface = {
   API_BASE: 'http://localhost:3001',

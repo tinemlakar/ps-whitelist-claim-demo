@@ -11,7 +11,7 @@ interface Props extends /* @vue-ignore */ ModalProps {
 }
 
 const props = defineProps<Props>();
-const emits = defineEmits(['close']);
+defineEmits(['close']);
 </script>
 
 <template>
