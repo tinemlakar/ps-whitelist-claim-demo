@@ -24,13 +24,6 @@ export default function useContract() {
 
   const contract = ref();
 
-  const { refetch: getWalletUsed } = useContractRead({
-    address: contractAddress,
-    abi,
-    functionName: 'walletUsed',
-    args: [address.value],
-  });
-
   async function isWalletUsed() {
     return (await contract.value.read.walletUsed([address.value])) as boolean;
   }
@@ -128,7 +121,6 @@ export default function useContract() {
     getBalance,
     getTokenOfOwner,
     getTokenUri,
-    getWalletUsed,
     isWalletUsed,
     initContract,
     mint,
