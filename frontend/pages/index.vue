@@ -25,6 +25,16 @@ const walletSignature = ref<string | null>(null);
 
 const timeToStart = computed(() => config.public.CLAIM_START - timestamp.value);
 
+watch(
+  () => address.value,
+  walletAddress => {
+    if (!walletAddress) {
+      metadata.value = null;
+      walletSignature.value = null;
+    }
+  }
+);
+
 async function validateWallet() {
   loading.value = true;
   try {

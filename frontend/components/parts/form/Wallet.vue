@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import WalletSVG from '~/assets/images/wallet.svg';
 import { useConnect } from 'use-wagmi';
+import WalletSVG from '~/assets/images/wallet.svg';
 
 const { connect, connectors, pendingConnector } = useConnect();
 </script>

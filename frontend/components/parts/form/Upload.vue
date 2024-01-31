@@ -42,8 +42,8 @@
 </template>
 
 <script lang="ts" setup>
-import { UploadCustomRequestOptions } from 'naive-ui';
-import { FileInfo } from 'naive-ui/es/upload/src/interface';
+import type { UploadCustomRequestOptions } from 'naive-ui';
+import type { FileInfo } from 'naive-ui/es/upload/src/interface';
 
 defineEmits(['close', 'proceed']);
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import UploadSVG from '~/assets/images/upload.svg';
 import { useAccount } from 'use-wagmi';
+import UploadSVG from '~/assets/images/upload.svg';
 
 useHead({
   title: 'Apillon whitelist claim prebuilt solution',

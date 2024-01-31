@@ -9,8 +9,6 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType } from 'vue';
-
 defineProps({
   statistics: { type: Object as PropType<StatisticsInterface>, default: null },
 });
