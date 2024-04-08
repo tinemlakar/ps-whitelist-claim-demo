@@ -1,0 +1,39 @@
+#####
+# This is an example of docker compose file for Apillon pre-built solutions. You are encouraged to change it according to your needs.
+#####
+
+version: '3.8'
+
+services:
+  whitelist-claim_db:
+    image: mysql
+    container_name: whitelist-claim_db
+    
+    ## Enviroment variables can be set in .env files or from build environment
+    ## Here is how you can use .env file (note: should be separate for each container)
+    env_file:
+      - .env.sql.deploy
+
+    ## If you want to read variables from build environment comment out above section and uncomment below
+    # environment:
+    #   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    #   MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+    ports:
+      - '3306:3306'
+    restart: always
+
+  whitelist-claim_app:
+    image: ps-whitelist-claim:latest
+    container_name: whitelist-claim_app
+    depends_on:
+      - whitelist-claim_db
+
+    ## Enviroment variables can be set in .env files or from build environment
+    ## Here is how you can use .env file (note: should be separate for each container)
+    env_file:
+      - .env.deploy
+
+    ports:
+      - '8080:3000'
+    restart: always

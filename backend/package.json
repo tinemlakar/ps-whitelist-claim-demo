@@ -6,10 +6,11 @@
   "scripts": {
     "test": "npx jest --config jestconfig.json --forceExit --detectOpenHandles --runInBand",
     "development:run": "node -r ts-node/register --inspect ./src/scripts/start-http",
-    "cron": "node -r ts-node/register --inspect ./src/scripts/start-cron",
     "dev": "npm run development:run",
+    "build": "tsc",
     "tsc": "tsc",
     "db-upgrade": "node -r ts-node/register ./src/scripts/db/upgrade-db",
+    "db-upgrade:ci": "node -r ts-node/register ./src/scripts/db/upgrade-db --F",
     "db-downgrade": "node -r ts-node/register ./src/scripts/db/downgrade-db",
     "db-rebuild": "node -r ts-node/register ./src/scripts/db/rebuild-db",
     "db-drop": "node -r ts-node/register ./src/scripts/db/drop-db"
