@@ -1,4 +1,34 @@
-#Whitelist claim prebuild solution
+# Whitelist claim prebuild solution Frontend
+
+This repository contains source code for Whitelist NFT Claim website.
+
+## Overview
+
+Solution has 2 main parts. Admin dashboard and claiming page.
+
+In the claiming page users can see when the claiming process will start, can connect their wallet to see if they are eligible for the claim and if they are can perform the claim transaction on chain.
+
+In the admin you can add the addresses that are whitelisted.
+
+## Configuration
+
+In `lib/config/` we can find configs for different environments.
+
+```ts
+const config: ConfigInterface = {
+  API_BASE: 'http://localhost:3001',
+  CHAIN_ID: 1287,
+  CONTRACT_ADDRESS: null,
+  CLAIM_START: 0,
+};
+```
+
+You need to update this config for a smoother frontend experience.
+
+- `API_BASE` presents the URL where backend (API) lives.
+- `CHAIN_ID` is the ID of the EVM chain that you NFTs are.
+- `CONTRACT_ADDRESS` is the onchain contract address of your NFT collection.
+- `CLAIM_START` Unix timestamp of when the claiming process starts (this is also set on chain on the smart contract). This is used to show a countdown timer without needing to connect metamask.
 
 ## Stack
 
