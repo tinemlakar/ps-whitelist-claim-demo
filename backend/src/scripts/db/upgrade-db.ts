@@ -16,7 +16,7 @@ const run = async () => {
   await upgradeDatabase(steps);
 };
 
-const executeFn = (answer) => {
+const executeFn = answer => {
   steps = parseInt(answer);
   if (answer.toUpperCase() === 'Y') {
     steps = 0;
@@ -35,7 +35,7 @@ const executeFn = (answer) => {
       console.log('Complete!');
       process.exit(0);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       process.exit(1);
     });
@@ -43,12 +43,10 @@ const executeFn = (answer) => {
 
 if (showDialog) {
   rl.question(
-    `You are about to upgrade database ${bgYellow(
-      black(` ${env.MYSQL_DB} @ ${env.MYSQL_HOST} `)
-    )}.
+    `You are about to upgrade database ${bgYellow(black(` ${env.MYSQL_DB} @ ${env.MYSQL_HOST} `))}.
 
 Set number of versions to upgrade ('Y' for all, '<number>' for number of versions, 'N' to exit):`,
-    (answer) => executeFn(answer)
+    answer => executeFn(answer)
   );
 } else {
   executeFn('Y');

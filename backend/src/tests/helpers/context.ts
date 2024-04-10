@@ -1,7 +1,7 @@
-import { env } from "../../config/env";
-import { MySql, HttpServer } from "../../index";
-import { Context } from "../../context";
-import * as express from "express";
+import { env } from '../../config/env';
+import { MySql, HttpServer } from '../../index';
+import { Context } from '../../context';
+import * as express from 'express';
 
 export interface Stage {
   context: Context;
@@ -9,14 +9,12 @@ export interface Stage {
   app: express.Application;
 }
 
-export async function createContextAndStartServer(
-  overrideEnv?: any
-): Promise<Stage> {
+export async function createContextAndStartServer(overrideEnv?: any): Promise<Stage> {
   let useEnv = env;
   if (overrideEnv) {
     useEnv = { ...env, ...overrideEnv };
   }
-  useEnv.APP_ENV = "testing";
+  useEnv.APP_ENV = 'testing';
   const mysql = new MySql(useEnv);
   const api = new HttpServer({ env: useEnv, mysql });
   try {
@@ -28,19 +26,15 @@ export async function createContextAndStartServer(
     // const databaseName = await mysql.paramQuery('SELECT DATABASE() as DB').then(res => res[0].DB);
     // tslint:disable-next-line: comment-type
     if (
-      useEnv.APP_ENV !== "testing" ||
+      useEnv.APP_ENV !== 'testing' ||
       !useEnv.MYSQL_DB_TEST ||
-      !useEnv.MYSQL_DB_TEST.endsWith(
-        "test"
-      ) /*|| !databaseName.endsWith('test')*/
+      !useEnv.MYSQL_DB_TEST.endsWith('test') /*|| !databaseName.endsWith('test')*/
     ) {
-      console.error(
-        "NOT ON TESTING DATABASE, EXITING (if you are sure, comment this check out)"
-      );
-      throw new Error("NOT ON TESTING DATABASE!");
+      console.error('NOT ON TESTING DATABASE, EXITING (if you are sure, comment this check out)');
+      throw new Error('NOT ON TESTING DATABASE!');
     }
   } catch (err) {
-    console.log("Error during context creation and server run", err);
+    console.log('Error during context creation and server run', err);
     await api.close();
     await mysql.close();
     process.exit(1);
