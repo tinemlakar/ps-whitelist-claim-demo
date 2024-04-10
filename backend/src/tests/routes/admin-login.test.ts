@@ -1,16 +1,15 @@
+import { HDNodeWallet, Wallet } from 'ethers';
+import * as request from 'supertest';
 import {
   createContextAndStartServer,
   Stage,
   stopServerAndCloseMySqlContext,
 } from '../helpers/context';
-import * as request from 'supertest';
-import { setupTestDatabase, clearTestDatabase } from '../helpers/migrations';
-import { HDNodeWallet, Wallet } from 'ethers';
-import { Identity } from '@apillon/sdk';
+import { clearTestDatabase, setupTestDatabase } from '../helpers/migrations';
 let stage: Stage;
 let adminWallet: HDNodeWallet;
 
-describe.skip('admin login', () => {
+describe('admin login', () => {
   beforeAll(async () => {
     adminWallet = Wallet.createRandom();
     stage = await createContextAndStartServer({

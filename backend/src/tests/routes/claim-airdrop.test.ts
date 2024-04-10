@@ -2,18 +2,18 @@ import {
   createContextAndStartServer,
   Stage,
   stopServerAndCloseMySqlContext,
-} from "../helpers/context";
-import * as request from "supertest";
-import { setupTestDatabase, clearTestDatabase } from "../helpers/migrations";
-import { User } from "../../models/user";
-import { ethers, HDNodeWallet } from "ethers";
-import { Identity } from "@apillon/sdk";
+} from '../helpers/context';
+import * as request from 'supertest';
+import { setupTestDatabase, clearTestDatabase } from '../helpers/migrations';
+import { User } from '../../models/user';
+import { ethers, HDNodeWallet } from 'ethers';
+import { Identity } from '@apillon/sdk';
 
 let stage: Stage;
 let user: User;
 let wallet: HDNodeWallet;
 
-describe("claim airdrop - after start", () => {
+describe('claim airdrop - after start', () => {
   beforeAll(async () => {
     const time = new Date().getTime() - 1;
     stage = await createContextAndStartServer({
@@ -22,9 +22,7 @@ describe("claim airdrop - after start", () => {
     await setupTestDatabase();
 
     wallet = ethers.Wallet.createRandom();
-    user = new User({}, stage.context)
-      .fake()
-      .populate({ wallet: wallet.address });
+    user = new User({}, stage.context).fake().populate({ wallet: wallet.address });
     await user.create();
   });
 
@@ -33,9 +31,9 @@ describe("claim airdrop - after start", () => {
     await stopServerAndCloseMySqlContext(stage);
   });
 
-  test("successfully claims", async () => {
+  test('successfully claims', async () => {
     const identity = new Identity();
-    const message = identity.generateSigningMessage("test");
+    const message = identity.generateSigningMessage('test');
     const signature = await wallet.signMessage(message.message);
 
     const data = {
@@ -44,18 +42,16 @@ describe("claim airdrop - after start", () => {
       signature,
     };
 
-    const res = await request(stage.app).post("/users/claim").send(data);
+    const res = await request(stage.app).post('/users/claim').send(data);
 
     expect(res.status).toBe(200);
     expect(res.body.data.signature).toBeDefined();
-    const fetchUser = await new User({}, stage.context).populateByWallet(
-      user.wallet
-    );
+    const fetchUser = await new User({}, stage.context).populateByWallet(user.wallet);
     expect(fetchUser.signature).toBeDefined();
   });
 });
 
-describe("claim airdrop - before start", () => {
+describe('claim airdrop - before start', () => {
   beforeAll(async () => {
     const time = new Date().getTime() + 100000;
     stage = await createContextAndStartServer({
@@ -64,9 +60,7 @@ describe("claim airdrop - before start", () => {
     await setupTestDatabase();
 
     wallet = ethers.Wallet.createRandom();
-    user = new User({}, stage.context)
-      .fake()
-      .populate({ wallet: wallet.address });
+    user = new User({}, stage.context).fake().populate({ wallet: wallet.address });
     await user.create();
   });
 
@@ -75,9 +69,9 @@ describe("claim airdrop - before start", () => {
     await stopServerAndCloseMySqlContext(stage);
   });
 
-  test("successfully claims", async () => {
+  test('should not return signature', async () => {
     const identity = new Identity();
-    const message = identity.generateSigningMessage("test");
+    const message = identity.generateSigningMessage('test');
     const signature = await wallet.signMessage(message.message);
 
     const data = {
@@ -86,7 +80,7 @@ describe("claim airdrop - before start", () => {
       signature,
     };
 
-    const res = await request(stage.app).post("/users/claim").send(data);
+    const res = await request(stage.app).post('/users/claim').send(data);
 
     expect(res.status).toBe(200);
     expect(res.body.data.signature).toBeNull();
