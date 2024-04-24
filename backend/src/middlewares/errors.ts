@@ -1,7 +1,7 @@
-import { Application } from "express";
-import messages from "../config/messages";
-import { SystemErrorCode } from "../config/values";
-import { NextFunction, Request, Response } from "../http";
+import { Application } from 'express';
+import messages from '../config/messages';
+import { SystemErrorCode } from '../config/values';
+import { NextFunction, Request, Response } from '../http';
 import {
   ResourceError,
   UnauthenticatedError,
@@ -11,7 +11,7 @@ import {
   GenericError,
   SqlError,
   SystemError,
-} from "../lib/errors";
+} from '../lib/errors';
 
 /**
  * Applies error-related routes to application.
@@ -43,12 +43,7 @@ export function handleNotFound(req: Request, res: Response): void {
  * @param next ExpressJS next function.
  */
 // @ts-ignore
-export function handleError(
-  error: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function handleError(error: any, req: Request, res: Response, next: NextFunction): void {
   if (
     error instanceof UnauthenticatedError ||
     error instanceof UnauthorizedError ||
@@ -65,7 +60,7 @@ export function handleError(
   } else if (error instanceof ValidationError) {
     res.throw(
       error.status,
-      error.model.collectErrors().map((e) => ({
+      error.model.collectErrors().map(e => ({
         code: e.code,
         message: messages(e.code),
         path: e.path,
@@ -76,7 +71,7 @@ export function handleError(
       code: error.code || SystemErrorCode.UNHANDLED_SYSTEM_ERROR, // expose only error code
       message: messages(SystemErrorCode.UNHANDLED_SYSTEM_ERROR), // don't expose message to users
     });
-    console.error("Error:", error);
+    console.error('Error:', error);
   }
 
   next();

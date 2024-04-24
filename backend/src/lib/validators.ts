@@ -1,11 +1,11 @@
-import { BaseSqlModel, SqlModelStatus } from "../models/base-sql-model";
-import { isNullOrUndefined } from "util";
-import { stringLengthValidator } from "@rawmodel/validators";
+import { BaseSqlModel, SqlModelStatus } from '../models/base-sql-model';
+import { isNullOrUndefined } from 'util';
+import { stringLengthValidator } from '@rawmodel/validators';
 
 /**
  * Expose standard validators.
  */
-export * from "@rawmodel/validators";
+export * from '@rawmodel/validators';
 
 export function conditionalPresenceValidator(condition: boolean, value: any) {
   if (condition) {
@@ -58,16 +58,16 @@ export function customArrayLengthValidator(options?: {
     }
     const size = value.length;
     const { min, minOrEqual, max, maxOrEqual } = options;
-    if (typeof min === "number" && !(size > min)) {
+    if (typeof min === 'number' && !(size > min)) {
       return false;
     }
-    if (typeof minOrEqual === "number" && !(size >= minOrEqual)) {
+    if (typeof minOrEqual === 'number' && !(size >= minOrEqual)) {
       return false;
     }
-    if (typeof max === "number" && !(size < max)) {
+    if (typeof max === 'number' && !(size < max)) {
       return false;
     }
-    if (typeof maxOrEqual === "number" && !(size <= maxOrEqual)) {
+    if (typeof maxOrEqual === 'number' && !(size <= maxOrEqual)) {
       return false;
     }
     return true;
@@ -80,7 +80,7 @@ export function customArrayLengthValidator(options?: {
 export function uniqueFieldValue(
   sqlTableName: string,
   fieldName: string,
-  idField = "id",
+  idField = 'id',
   checkNull = false
 ) {
   return async function (this: BaseSqlModel, value: any) {
@@ -95,7 +95,7 @@ export function uniqueFieldValue(
       AND (@id IS NULL OR (@id IS NOT NULL AND \`${idField}\` <> @id ))`,
         { value, id: this.id }
       )
-      .then((rows) => rows[0].Count);
+      .then(rows => rows[0].Count);
 
     return count === 0;
   };
@@ -108,7 +108,7 @@ export function uniqueFieldValueById(
   sqlTableName: string,
   fieldName: string,
   foreignId: string,
-  idField = "id",
+  idField = 'id',
   checkNull = false
 ) {
   return async function (this: BaseSqlModel, value: any) {
@@ -123,7 +123,7 @@ export function uniqueFieldValueById(
       AND (@id IS NULL OR (@id IS NOT NULL AND \`${idField}\` <> @id ))`,
         { value, id: this.id, foreignId: this[foreignId] }
       )
-      .then((rows) => rows[0].Count);
+      .then(rows => rows[0].Count);
 
     return count === 0;
   };
@@ -136,7 +136,7 @@ export function uniqueFieldValueByIdActive(
   sqlTableName: string,
   fieldName: string,
   foreignId: string,
-  idField = "id",
+  idField = 'id',
   checkNull = false
 ) {
   return async function (this: BaseSqlModel, value: any) {
@@ -151,7 +151,7 @@ export function uniqueFieldValueByIdActive(
       AND (@id IS NULL OR (@id IS NOT NULL AND \`${idField}\` <> @id ))`,
         { value, id: this.id, foreignId: this[foreignId] }
       )
-      .then((rows) => rows[0].Count);
+      .then(rows => rows[0].Count);
 
     return count === 0;
   };
@@ -170,7 +170,7 @@ export function foreignKeyPresence(sqlTableName: string) {
     `,
         { value }
       )
-      .then((rows) => rows[0].Count);
+      .then(rows => rows[0].Count);
 
     return count !== 0;
   };
@@ -204,15 +204,9 @@ export function enumInclusionValidator(enumerator: any) {
   };
 }
 
-export function statusDependantPresenceValidator(
-  status: SqlModelStatus,
-  exclusion = false
-) {
+export function statusDependantPresenceValidator(status: SqlModelStatus, exclusion = false) {
   return function (this: BaseSqlModel, value: any) {
-    if (
-      (this.status == status && !exclusion) ||
-      (this.status != status && exclusion)
-    ) {
+    if ((this.status == status && !exclusion) || (this.status != status && exclusion)) {
       return !!value;
     } else {
       return true;

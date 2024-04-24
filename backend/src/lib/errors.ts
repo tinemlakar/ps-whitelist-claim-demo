@@ -1,8 +1,8 @@
-import { Model } from "@rawmodel/core";
-import messages from "../config/messages";
-import { writeLog, LogType } from "./logger";
-import { Context } from "../context";
-import { SystemErrorCode } from "../config/values";
+import { Model } from '@rawmodel/core';
+import messages from '../config/messages';
+import { writeLog, LogType } from './logger';
+import { Context } from '../context';
+import { SystemErrorCode } from '../config/values';
 
 /**
  * Handled system error.
@@ -26,7 +26,7 @@ export class SystemError extends Error {
       LogType.ERROR,
       //  `(user: ${ctx && ctx.user ? `${ctx.user.id} ${ctx.user.email}` : "NA"})`,
       `(id: ${ctx.id} : "NA"})`,
-      "SystemError",
+      'SystemError',
       sourceFunction,
       this
     );
@@ -54,13 +54,7 @@ export class ResourceError extends Error {
 
     Error.captureStackTrace(this, this.constructor);
 
-    writeLog(
-      LogType.ERROR,
-      `(id: ${ctx?.id} : "NA"})`,
-      "ResourceError",
-      sourceFunction,
-      this
-    );
+    writeLog(LogType.ERROR, `(id: ${ctx?.id} : "NA"})`, 'ResourceError', sourceFunction, this);
   }
 }
 
@@ -89,7 +83,7 @@ export class UnauthenticatedError extends Error {
       LogType.MESSAGE,
       // `(user: ${ctx && ctx.user ? `${ctx.user.id} ${ctx.user.email}` : "NA"})`,
       `(id: ${ctx.id} : "NA"})`,
-      "UnauthenticatedError",
+      'UnauthenticatedError',
       sourceFunction,
       this
     );
@@ -122,7 +116,7 @@ export class UnauthorizedError extends Error {
       //`(user: ${ctx && ctx.user ? `${ctx.user.id} ${ctx.user.email}` : "NA"})`,
 
       `(id: ${ctx.id} : "NA"})`,
-      "UnauthorizedError",
+      'UnauthorizedError',
       sourceFunction,
       this
     );
@@ -151,22 +145,16 @@ export class ValidationError extends Error {
 
     const validationErrorsStr = this.model
       .collectErrors()
-      .map((x) => {
+      .map(x => {
         return JSON.stringify({
           code: x.code,
           message: messages(x.code),
           path: x.path,
         });
       })
-      .join(", ");
+      .join(', ');
 
-    writeLog(
-      LogType.MESSAGE,
-      `${validationErrorsStr}`,
-      "ValidationError",
-      sourceFunction,
-      this
-    );
+    writeLog(LogType.MESSAGE, `${validationErrorsStr}`, 'ValidationError', sourceFunction, this);
   }
 }
 
@@ -188,8 +176,8 @@ export class ProcedureError extends Error {
     writeLog(
       LogType.MESSAGE,
       `${errMsg} | Result: ${JSON.stringify(this.sqlResult)}`,
-      "ProcedureError",
-      "",
+      'ProcedureError',
+      '',
       this
     );
   }
@@ -214,11 +202,7 @@ export class SqlError extends Error {
     query?: string,
     sourceFunction?: string
   ) {
-    super(
-      messages(code) ||
-        messages(SystemErrorCode.DATABASE_ERROR) ||
-        error.message
-    );
+    super(messages(code) || messages(SystemErrorCode.DATABASE_ERROR) || error.message);
 
     this.name = this.constructor.name;
     this.code = code || SystemErrorCode.DATABASE_ERROR;
@@ -228,8 +212,8 @@ export class SqlError extends Error {
 
     writeLog(
       LogType.ERROR,
-      `( sql: ${query || "NA"}): ${error ? error.message : ""}`,
-      "SqlError",
+      `( sql: ${query || 'NA'}): ${error ? error.message : ''}`,
+      'SqlError',
       sourceFunction,
       this
     );
