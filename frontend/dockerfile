@@ -1,0 +1,21 @@
+FROM node:21-alpine
+
+ENV ENV=production
+
+
+ENV appDir /app
+RUN mkdir -p /app
+
+WORKDIR ${appDir}
+
+ADD ./ ${appDir}/
+
+RUN npm install 
+RUN npm run build
+
+ENV NUXT_HOST=0.0.0.0
+ENV NITRO_PORT=8000
+
+EXPOSE 8000
+
+CMD [ "npm", "run", "start" ]

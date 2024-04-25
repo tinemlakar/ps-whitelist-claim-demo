@@ -51,5 +51,5 @@ RUN npm install
 RUN npm run build
 
 EXPOSE 3000
-RUN chmod +x ./bin/docker-start.sh
+RUN chmod +x ./bin/docker-start.sh ./bin/create-database.sh
 CMD ["./bin/docker-start.sh"]
