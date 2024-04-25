@@ -22,7 +22,7 @@ defineProps({
         <p class="mb-4">{{ metadata.description }}</p>
         <a
           v-if="txHash"
-          :href="`https://sepolia.etherscan.io/tx/${txHash}`"
+          :href="`https://moonbase.moonscan.io/tx/${txHash}`"
           class="text-yellow hover:underline"
           target="_blank"
         >

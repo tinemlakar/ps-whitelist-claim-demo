@@ -7,7 +7,7 @@ import {
   useWalletClient,
 } from 'use-wagmi';
 import { getContract } from 'viem';
-import { mainnet, sepolia } from 'use-wagmi/chains';
+import { moonbeam, moonbaseAlpha } from 'use-wagmi/chains';
 import { abi } from '~/lib/config/abi';
 
 export default function useContract() {
@@ -20,7 +20,7 @@ export default function useContract() {
   const { data: walletClient } = useWalletClient();
 
   const contractAddress = config.public.CONTRACT_ADDRESS as `0x${string}`;
-  const usedChain = config.public.env === 'prod' ? mainnet : sepolia;
+  const usedChain = config.public.env === 'prod' ? moonbeam : moonbaseAlpha;
 
   const contract = ref();
 
