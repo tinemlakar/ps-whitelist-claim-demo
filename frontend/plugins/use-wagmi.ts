@@ -3,11 +3,11 @@ import { MetaMaskConnector } from 'use-wagmi/connectors/metaMask';
 import { CoinbaseWalletConnector } from 'use-wagmi/connectors/coinbaseWallet';
 import { WalletConnectConnector } from 'use-wagmi/connectors/walletConnect';
 import { createPublicClient, http } from 'viem';
-import { mainnet, sepolia } from 'use-wagmi/chains';
+import { moonbeam, moonbaseAlpha } from 'use-wagmi/chains';
 
 export default defineNuxtPlugin(nuxtApp => {
   const nuxtConfig = useRuntimeConfig();
-  const chain = nuxtConfig.public.env === 'prod' ? mainnet : sepolia;
+  const chain = nuxtConfig.public.env === 'prod' ? moonbeam : moonbaseAlpha;
   const chains = [chain];
 
   const config = createConfig({
